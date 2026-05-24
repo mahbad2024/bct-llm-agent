@@ -43,7 +43,7 @@
 
 <p><strong>Key Innovations:</strong></p>
 <ol>
-    <li>Few-shot prompting using 168,193 real reviews from Amazon, Yelp, AND Goodreads</li>
+    <li>Few-shot prompting using 177,193 real reviews from Amazon, Yelp, AND Goodreads</li>
     <li>Hybrid rating predictor (RandomForest ML model + rule-based fallback)</li>
     <li>Nigerian Pidgin and cultural context integration</li>
     <li>Multi-turn conversational cold-start handling</li>
@@ -73,7 +73,7 @@
 │         Data Layer                 │
 │  • 147K Amazon Gift Card reviews  │
 │  • 20K Yelp reviews                │
-│  • 1K Goodreads reviews           │
+│  • 10K Goodreads reviews          │
 └─────────────────┬───────────────────┘
                   │
             ┌─────▼─────┐
@@ -106,8 +106,8 @@
     <tr><th>Dataset</th><th>Size</th><th>Source</th></tr>
     <tr><td>Amazon Gift Cards</td><td>147,193 reviews</td><td>Public dataset</td></tr>
     <tr><td>Yelp Reviews</td><td>20,000 reviews</td><td>Yelp Open Dataset</td></tr>
-    <tr><td>Goodreads Books</td><td>1,000 reviews</td><td>Goodreads dataset</td></tr>
-    <tr><td><strong>Total</strong></td><td><strong>168,193 reviews</strong></td><td><strong>All 3 required datasets</strong></td></tr>
+    <tr><td>Goodreads Books</td><td>10,000 reviews</td><td>Goodreads dataset</td></tr>
+    <tr><td><strong>Total</strong></td><td><strong>177,193 reviews</strong></td><td><strong>All 3 required datasets</strong></td></tr>
 </table>
 
 <h2>4. Experiments &amp; Results</h2>
@@ -143,10 +143,12 @@
 <h2>5. Nigerian Context Adaptation (Bonus)</h2>
 <p>We implemented specific adaptations for the bonus marks:</p>
 <ul>
-    <li><strong>Language:</strong> Nigerian Pidgin phrases ("dey sweet", "abeg o", "well well", "the thing soft")</li>
+    <li><strong>Language:</strong> Nigerian Pidgin phrases ("dey sweet", "abeg o", "well well", "the thing soft", "Omo!", "na wa o", "Chai!", "God bless you")</li>
     <li><strong>Pricing:</strong> Nigerian Naira (₦) currency</li>
-    <li><strong>Locations:</strong> Lagos, Abuja, Yaba, UNILAG reference</li>
+    <li><strong>Locations:</strong> Lagos, Abuja, Yaba, Port Harcourt, Ibadan, Benin</li>
     <li><strong>Cultural items:</strong> Jollof Rice, Suya, Pounded Yam, Jumia, Showmax</li>
+    <li><strong>Price Sensitivity:</strong> Phrases like "my money no waste", "e be pricey small"</li>
+    <li><strong>Spice Preference:</strong> Phrases like "pepper body", "e dey hot well"</li>
 </ul>
 
 <p><strong>Example Prompt:</strong></p>
@@ -161,7 +163,7 @@ Use phrases like 'the thing soft well well' for good products."
 <div class="architecture">
 bct-llm-agent/
 ├── main_final.py          # Main API server
-├── data_loader_final.py   # Dataset loader (168K reviews)
+├── data_loader_final.py   # Dataset loader (177K reviews)
 ├── rating_predictor.py    # Rating prediction (ML)
 ├── cold_start.py          # Cold-start handler
 ├── evaluate_agent.py      # Scoring evaluation
@@ -183,16 +185,16 @@ python main_final.py
 <h2>7. Future Work</h2>
 <ol>
     <li>Fine-tune Llama 3.3 on Nigerian Pidgin corpus for better authenticity</li>
-    <li>Build user embeddings for more accurate similarity matching</li>
     <li>Implement reinforcement learning from user feedback</li>
     <li>Add multi-modal understanding (product images)</li>
     <li>Deploy as WhatsApp bot for real Nigerian users</li>
+    <li>Scale to real-time recommendations with caching</li>
 </ol>
 
 <h2>8. Conclusion</h2>
 <p>Our agent successfully demonstrates:</p>
 <ul>
-    <li>LLM-based user modeling with 168,193 real reviews (Amazon + Yelp + Goodreads)</li>
+    <li>LLM-based user modeling with 177,193 real reviews (Amazon + Yelp + Goodreads)</li>
     <li>Accurate rating prediction achieving RMSE of 0.55</li>
     <li>Nigerian Pidgin integration for cultural authenticity</li>
     <li>Cold-start and cross-domain recommendation handling</li>
