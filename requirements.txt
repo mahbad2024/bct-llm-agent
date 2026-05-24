@@ -11,3 +11,4 @@ rouge-score
 bert-score
 docker
 python-dotenv
+groq
