@@ -16,9 +16,7 @@ client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 # Initialize components
 print("Loading datasets...")
 loader = DataLoader()
-loader.load_amazon_data()
-loader.load_yelp_data(limit=2000)
-loader.merge_datasets()
+loader.load_all()
 
 print("Initializing rating predictor...")
 rating_predictor = RatingPredictor()

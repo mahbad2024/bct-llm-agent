@@ -1,42 +1,39 @@
-# train_model.py - Train rating predictor using your real data
+# train_model.py - Train rating predictor with all three datasets
 from rating_predictor import RatingPredictor
 from data_loader_final import DataLoader
 import random
-import numpy as np
 
 print("="*50)
 print("Training Rating Predictor Model")
 print("="*50)
 
-# Load your data
+# Load ALL datasets
 print("\n1. Loading datasets...")
 loader = DataLoader()
 loader.load_amazon_data()
-loader.load_yelp_data(limit=5000)  # Use 5000 Yelp reviews
+loader.load_yelp_data(limit=20000)
+loader.load_goodreads_data(limit=5000)
 loader.merge_datasets()
 print(f"   Total reviews available: {len(loader.all_reviews)}")
 
-# Prepare training data from your actual reviews
+# Prepare training data from all reviews
 print("\n2. Preparing training data...")
 training_data = []
 
-# Extract features from real reviews
-for review in loader.all_reviews[:10000]:  # Use 10,000 reviews for training
-    # Create user persona based on review data
+for review in loader.all_reviews[:20000]:
     user_persona = {
         'age': random.randint(18, 45),
         'preferences': {
             'price_sensitive': random.choice([True, False]),
             'likes_spicy': random.choice([True, False])
         },
-        'interests': random.sample(['food', 'tech', 'movies', 'shopping'], 2)
+        'interests': random.sample(['food', 'tech', 'movies', 'shopping', 'books'], 2)
     }
     
-    # Extract product info
     product_details = {
         'name': review.get('product_name', 'Product'),
         'category': review.get('category', 'general'),
-        'price': random.randint(1000, 10000),
+        'price': random.randint(500, 10000),
         'description': review.get('review_text', '')[:100]
     }
     
@@ -59,7 +56,7 @@ print("\n4. Testing model on sample...")
 test_user = {
     'age': 22,
     'preferences': {'price_sensitive': True, 'likes_spicy': True},
-    'interests': ['food', 'tech']
+    'interests': ['food', 'books']
 }
 test_product = {
     'name': 'Jollof Rice',
@@ -70,4 +67,5 @@ test_product = {
 
 predicted = predictor.predict_rating(test_user, test_product)
 print(f"   Test prediction: {predicted}/5 stars")
-print("\n✅ Model training complete! The warning will now disappear.")
+
+print("\n✅ Model training complete with all three datasets!")
