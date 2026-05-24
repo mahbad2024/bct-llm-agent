@@ -6,4 +6,6 @@ __pycache__/
 *.log
 .DS_Store
 .pytest_cache/
-.ipynb_checkpoints/
+.ipynb_checkpoints/"data/" 
+"models/" 
+"*.txt" 
