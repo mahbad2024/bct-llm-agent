@@ -56,7 +56,7 @@ class DataLoader:
         except Exception as e:
             print(f"Yelp load error: {e}")
     
-    def load_goodreads_data(self, limit: int = 5000):
+    def load_goodreads_data(self, limit: int = 10000):
         """Load Goodreads book reviews"""
         self.goodreads_reviews = []
         try:
@@ -99,7 +99,7 @@ class DataLoader:
         """Load all datasets at once"""
         self.load_amazon_data()
         self.load_yelp_data(limit=20000)
-        self.load_goodreads_data(limit=5000)
+        self.load_goodreads_data(limit=10000)
         self.merge_datasets()
     
     def get_embedding(self, text: str):
@@ -151,6 +151,28 @@ class DataLoader:
         
         return similar
     
+    def get_nigerian_context(self, user_persona: Dict) -> str:
+        """Generate Nigerian context instructions for the LLM"""
+        location = user_persona.get('location', 'Lagos')
+        age = user_persona.get('age', 25)
+        price_sensitive = user_persona.get('preferences', {}).get('price_sensitive', False)
+        likes_spicy = user_persona.get('preferences', {}).get('likes_spicy', False)
+        
+        nigerian_instructions = f"""
+IMPORTANT - NIGERIAN CONTEXT INSTRUCTIONS:
+- Write in Nigerian Pidgin English (not standard English)
+- Use phrases like: "dey sweet", "abeg o", "well well", "the thing soft", "Omo!", "na wa o", "e get as e be", "no wahala", "I swear", "Chai!", "God bless you", "pepper body"
+- Mention Nigerian locations like Lagos, Abuja, {location} naturally
+- Use ₦ (Naira) for prices
+- The user is {age} years old from {location}
+"""
+        if price_sensitive:
+            nigerian_instructions += "- This user is PRICE SENSITIVE. Use phrases like 'my money no waste', 'e be pricey small', 'abeg make dem reduce price'\n"
+        if likes_spicy:
+            nigerian_instructions += "- This user likes SPICY food. Use phrases like 'pepper body', 'e dey hot well', 'the pepper dey sweet my body'\n"
+        
+        return nigerian_instructions
+    
     def create_few_shot_prompt(self, user_persona: Dict, product_details: Dict) -> str:
         """Create prompt with semantically similar examples (embedding-based)"""
         # Try embedding-based retrieval first
@@ -168,6 +190,9 @@ class DataLoader:
             prompt += f"[Example {i} from {rev['source'].upper()}]\n"
             prompt += f"Rating: {rev['rating']}/5\n"
             prompt += f"Review: {rev['review_text'][:400]}\n\n"
+        
+        # Add Nigerian context
+        prompt += self.get_nigerian_context(user_persona)
         
         prompt += f"""
 Now write a new review for this product IN NIGERIAN PIDGIN/ENGLISH:
