@@ -5,4 +5,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY *.py . 
 COPY data/ ./data/ 
 EXPOSE 8000 
-CMD ["python", "main_final.py"] 
+CMD ["uvicorn", "main_final:app", "--host", "0.0.0.0", "--port", "10000"]
