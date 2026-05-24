@@ -12,7 +12,7 @@ print("\n1. Loading datasets...")
 loader = DataLoader()
 loader.load_amazon_data()
 loader.load_yelp_data(limit=20000)
-loader.load_goodreads_data(limit=5000)
+loader.load_goodreads_data(limit=10000)
 loader.merge_datasets()
 print(f"   Total reviews available: {len(loader.all_reviews)}")
 

@@ -8,10 +8,8 @@ An LLM-powered agent for user modeling and personalized recommendations, adapted
 |---------|---------|--------|
 | Amazon Gift Cards | 147,193 | Public dataset |
 | Yelp Reviews | 20,000 | Yelp Open Dataset |
-| Goodreads Books | 1,000 | Goodreads dataset |
-| **TOTAL** | **168,193** | **All 3 required datasets** |
-
-## 🏆 Tasks
+| Goodreads Books | **10,000** | Goodreads dataset |
+| **TOTAL** | **177,193** | **All 3 required datasets** |## 🏆 Tasks
 
 - **Task A:** Generate realistic user reviews with accurate ratings (Nigerian Pidgin)
 - **Task B:** Deliver personalized recommendations with cold-start handling
