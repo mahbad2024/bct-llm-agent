@@ -10,3 +10,4 @@ sentence-transformers
 rouge-score
 bert-score
 docker
+python-dotenv
