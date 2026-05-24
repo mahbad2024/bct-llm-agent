@@ -4,6 +4,7 @@ import json
 import random
 import os
 from typing import Dict, List, Any, Optional
+from sentence_transformers import SentenceTransformer
 
 class DataLoader:
     def __init__(self, data_path: str = "./data"):
@@ -12,6 +13,7 @@ class DataLoader:
         self.yelp_reviews = []
         self.goodreads_reviews = []
         self.all_reviews = []
+        self.embedding_model = None  
         
     def load_amazon_data(self):
         """Load Gift_Cards.csv"""
@@ -31,7 +33,7 @@ class DataLoader:
         except Exception as e:
             print(f"Amazon load error: {e}")
     
-    def load_yelp_data(self, limit: int = 5000):
+    def load_yelp_data(self, limit: int = 20000):
         """Load Yelp reviews"""
         try:
             count = 0
@@ -54,7 +56,7 @@ class DataLoader:
         except Exception as e:
             print(f"Yelp load error: {e}")
     
-    def load_goodreads_data(self, limit: int = 2000):
+    def load_goodreads_data(self, limit: int = 5000):
         """Load Goodreads book reviews"""
         self.goodreads_reviews = []
         try:
@@ -100,8 +102,38 @@ class DataLoader:
         self.load_goodreads_data(limit=5000)
         self.merge_datasets()
     
+    def get_embedding(self, text: str):
+        """Get embedding for a text using sentence-transformers"""
+        if self.embedding_model is None:
+            print("   Loading embedding model...")
+            self.embedding_model = SentenceTransformer('all-MiniLM-L6-v2')
+        return self.embedding_model.encode(text)
+    
+    def find_similar_reviews_by_embedding(self, product_details: Dict, limit: int = 3) -> List[Dict]:
+        """Find reviews using semantic similarity (better than random)"""
+        if not self.all_reviews:
+            return []
+        
+        # Create query text from product details
+        query = f"{product_details.get('name', '')} {product_details.get('category', '')} {product_details.get('description', '')}"
+        
+        # Get query embedding
+        query_emb = self.get_embedding(query)
+        
+        # Calculate similarity with first 1000 reviews (faster)
+        similarities = []
+        for i, review in enumerate(self.all_reviews[:1000]):
+            review_text = f"{review.get('product_name', '')} {review.get('category', '')} {review.get('review_text', '')[:200]}"
+            review_emb = self.get_embedding(review_text)
+            similarity = query_emb.dot(review_emb)
+            similarities.append((similarity, review))
+        
+        # Sort by similarity and return top matches
+        similarities.sort(reverse=True, key=lambda x: x[0])
+        return [review for _, review in similarities[:limit]]
+    
     def get_similar_reviews(self, product_category: str, limit: int = 3) -> List[Dict]:
-        """Get reviews similar to product category"""
+        """Get reviews similar to product category (fallback method)"""
         similar = []
         for review in self.all_reviews:
             if review["category"] == product_category or review["source"] == "yelp":
@@ -120,9 +152,14 @@ class DataLoader:
         return similar
     
     def create_few_shot_prompt(self, user_persona: Dict, product_details: Dict) -> str:
-        """Create prompt with real examples from dataset"""
-        category = product_details.get("category", "general")
-        similar_reviews = self.get_similar_reviews(category, limit=2)
+        """Create prompt with semantically similar examples (embedding-based)"""
+        # Try embedding-based retrieval first
+        similar_reviews = self.find_similar_reviews_by_embedding(product_details, limit=2)
+        
+        # Fallback to category-based if embedding fails
+        if not similar_reviews or len(similar_reviews) < 2:
+            category = product_details.get("category", "general")
+            similar_reviews = self.get_similar_reviews(category, limit=2)
         
         prompt = """Here are REAL reviews from the Amazon/Yelp/Goodreads datasets for similar products:
 
